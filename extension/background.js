@@ -1,11 +1,13 @@
-var pic_url = ""
+var pic_url = "";
 
 function receiver(request, sender, sendResponse) {
   
-  if (request.action === "send_pic_url") {
+  if (request.action === ActionEnum.sendPic) {
   	pic_url = request.pic_url;
-  } else if (request.action === "show_page_action") {
+  } else if (request.action === ActionEnum.showPage) {
   	chrome.pageAction.show(sender.tab.id);
+  } else {
+  	console.error("Unexpected message: " + request.action)
   }
 
 }
