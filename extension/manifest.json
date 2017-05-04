@@ -11,6 +11,7 @@
       "js": ["common.js", "content.js"]
     }
   ],
+  "web_accessible_resources": ["instagram.js"],
   "page_action": {
     "default_icon": "icon128.png"
   },

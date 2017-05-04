@@ -1,12 +1,18 @@
+// tab_url -> [pics_url]
 var pics = {}
 
 function receiver(request, sender, sendResponse) {
-  
+
   if (request.action === ActionEnum.sendPic) {
   	const tabUrl = request.tab_url;
   	const picUrl = request.pic_url;
 
-  	pics[tabUrl] = picUrl;
+  	pics[tabUrl] = [picUrl];
+  } else if (request.action === ActionEnum.sendMultiPic) {
+    const tabUrl = request.tab_url;
+    const urls = request.urls;
+
+    pics[tabUrl] = urls;
   } else if (request.action === ActionEnum.showPage) {
   	chrome.pageAction.show(sender.tab.id);
   } else {
@@ -17,8 +23,9 @@ function receiver(request, sender, sendResponse) {
 
 
 function click(tab) {
-  const picUrl = pics[tab.url];  
-  chrome.tabs.create({url: picUrl, active: false});
+  const urls = pics[tab.url];
+
+  urls.forEach(picUrl => {chrome.tabs.create({url: picUrl, active: false});});  
 }
 
 // Listening for messages
