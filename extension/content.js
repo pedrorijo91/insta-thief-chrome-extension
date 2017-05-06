@@ -3,13 +3,13 @@
  - Content script runs in "isolated world environment" policy (https://developer.chrome.com/extensions/content_scripts#execution-environment)
  - Injected script can't (?) call chrome.* APIs
  - Solution from: http://stackoverflow.com/a/9636008/4398050
-*/
+ */
 
 var s = document.createElement('script');
 // add "instagram.js" to web_accessible_resources in manifest.json
 s.src = chrome.extension.getURL('instagram.js');
 s.onload = function() {
-    this.remove();
+  this.remove();
 };
 (document.head || document.documentElement).appendChild(s);
 
@@ -18,30 +18,30 @@ const breadcrumbClassName = '_lfres';
 
 function detectMultiPic() {
 	return document.getElementsByClassName(arrowClassName).length > 0 || 
-		document.getElementsByClassName(breadcrumbClassName) > 0;
+  document.getElementsByClassName(breadcrumbClassName) > 0;
 }
 
 const tabUrl = window.location.href;
 
 document.addEventListener('RW759_connectExtension', function(e) {
-    const sharedData = e.detail;
+  const sharedData = e.detail;
 
-    const isMultiPic = detectMultiPic();
+  const isMultiPic = detectMultiPic();
 
-	if(isMultiPic) {
-		try {
-			const urls = sharedData.entry_data.PostPage[0].graphql.shortcode_media.edge_sidecar_to_children.edges.map(el => { return el.node.display_url; });
-			chrome.runtime.sendMessage({ "action": ActionEnum.sendMultiPic, "tab_url": tabUrl, "urls": urls});
-		} catch (err) {
-			console.error('could not get multipic urls: ' + err);
-		}
-		
-	} else {
-		const pic = document.getElementById("pImage_0");
-		chrome.runtime.sendMessage({ "action": ActionEnum.sendPic, "tab_url": tabUrl, "pic_url": pic.src });
-	}
+  if(isMultiPic) {
+    try {
+     const urls = sharedData.entry_data.PostPage[0].graphql.shortcode_media.edge_sidecar_to_children.edges.map(el => { return el.node.display_url; });
+     chrome.runtime.sendMessage({ "action": ActionEnum.sendMultiPic, "tab_url": tabUrl, "urls": urls});
+   } catch (err) {
+     console.error('could not get multipic urls: ' + err);
+   }
 
-	chrome.runtime.sendMessage({ "action": ActionEnum.showPage});
+ } else {
+  const pic = document.getElementById("pImage_0");
+  chrome.runtime.sendMessage({ "action": ActionEnum.sendPic, "tab_url": tabUrl, "pic_url": pic.src });
+}
+
+chrome.runtime.sendMessage({ "action": ActionEnum.showPage});
 
 });
 
