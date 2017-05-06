@@ -13,6 +13,11 @@ function receiver(request, sender, sendResponse) {
     const urls = request.urls;
 
     pics[tabUrl] = urls;
+  } else if(request.action === ActionEnum.sendVideo) {
+    const tabUrl = request.tab_url;
+    const videoUrl = request.video_url;
+
+    pics[tabUrl] = [videoUrl];
   } else if (request.action === ActionEnum.showPage) {
   	chrome.pageAction.show(sender.tab.id);
   } else {
