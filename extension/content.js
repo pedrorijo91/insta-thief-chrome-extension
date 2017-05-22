@@ -13,11 +13,28 @@ s.onload = function() {
 };
 (document.head || document.documentElement).appendChild(s);
 
-const arrowClassName = '_90kqf';
-const breadcrumbClassName = '_lfres';
+var sharedDataGlob;
+
+document.addEventListener('RW759_connectExtension', function(e) {
+  sharedDataGlob = e.detail;
+  chrome.runtime.sendMessage({ "action": ActionEnum.showPage}); 
+});
+
+chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {    
+    if (msg.action === ActionEnum.clicked) {
+        urls = getMediaUrls(document);
+        urls.forEach(mediaUrl => download(document, mediaUrl));
+    } else {
+      console.error('Unexpected message action: ' + message.action);
+    }
+    
+});
 
 function detectMultiPic() {
-	return document.getElementsByClassName(arrowClassName).length > 0 || 
+  const arrowClassName = '_90kqf';
+  const breadcrumbClassName = '_lfres';
+
+  return document.getElementsByClassName(arrowClassName).length > 0 || 
   document.getElementsByClassName(breadcrumbClassName) > 0;
 }
 
@@ -25,33 +42,32 @@ function detectVideo() {
   return document.getElementsByTagName('video').length > 0;
 }
 
-const tabUrl = window.location.href;
-
-document.addEventListener('RW759_connectExtension', function(e) {
-  const sharedData = e.detail;
-
+function getMediaUrls(dom) {
   const isMultiPic = detectMultiPic();
   const isVideo = detectVideo();
 
   if(isVideo) {
-    const video = document.getElementsByTagName('video')[0];
-    chrome.runtime.sendMessage({ "action": ActionEnum.sendVideo, "tab_url": tabUrl, "video_url": video.src });
+    const video = dom.getElementsByTagName('video')[0];
+    return [video.src];
   } else if(isMultiPic) {
     try {
-     const urls = sharedData.entry_data.PostPage[0].graphql.shortcode_media.edge_sidecar_to_children.edges.map(el => { return el.node.display_url; });
-     chrome.runtime.sendMessage({ "action": ActionEnum.sendMultiPic, "tab_url": tabUrl, "urls": urls});
+     const urls = sharedDataGlob.entry_data.PostPage[0].graphql.shortcode_media.edge_sidecar_to_children.edges.map(el => { return el.node.display_url; });
+     return urls;    
     } catch (err) {
      console.error('could not get multipic urls: ' + err);
+     return [];
     }
   } else {
-    const pic = document.getElementById("pImage_0");
-    chrome.runtime.sendMessage({ "action": ActionEnum.sendPic, "tab_url": tabUrl, "pic_url": pic.src });
+    const pic = dom.getElementById("pImage_0");
+    return [pic.src];
   }
+}
 
-  chrome.runtime.sendMessage({ "action": ActionEnum.showPage});
-
-});
-
-
+function download(dom, picUrl) {
+    var pom = dom.createElement('a');
+    pom.setAttribute('href', picUrl);
+    pom.setAttribute('download', '');
+    pom.click();
+}
 
 
