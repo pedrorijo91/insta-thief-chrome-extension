@@ -31,8 +31,8 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 });
 
 function detectMultiPic() {
-  const arrowClassName = '_90kqf';
-  const breadcrumbClassName = '_lfres';
+  const arrowClassName = '_ifqgl';
+  const breadcrumbClassName = '_eusuj';
 
   return document.getElementsByClassName(arrowClassName).length > 0 || 
   document.getElementsByClassName(breadcrumbClassName) > 0;
