@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Insta Thief",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Easy download your favorite Instagram pictures",
   "permissions": ["storage"],
   "options_page": "options.html",
