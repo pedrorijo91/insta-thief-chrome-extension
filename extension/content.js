@@ -23,12 +23,19 @@ document.addEventListener('RW759_connectExtension', function(e) {
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {    
     if (msg.action === ActionEnum.clicked) {
         urls = getMediaUrls(document);
-        urls.forEach(mediaUrl => download(document, mediaUrl));
+        
+        getSaveOptions(function(items) {
+          urls.forEach(mediaUrl => download(document, mediaUrl, items.action)); 
+        });
     } else {
       console.error('Unexpected message action: ' + message.action);
     }
     
 });
+
+function getSaveOptions(callback) {
+  chrome.storage.sync.get({'action': OptionsEnum.download}, callback);
+}
 
 function detectMultiPic() {
   const arrowClassName = '_ifqgl';
@@ -63,11 +70,19 @@ function getMediaUrls(dom) {
   }
 }
 
-function download(dom, picUrl) {
-    var pom = dom.createElement('a');
-    pom.setAttribute('href', picUrl);
+function download(dom, picUrl, option) {
+  var pom = dom.createElement('a');
+  pom.setAttribute('href', picUrl);
+
+  if(option === OptionsEnum.download) {
     pom.setAttribute('download', '');
-    pom.click();
+  }
+
+  if(option === OptionsEnum.newTab) {
+    pom.setAttribute('target', "_blank");
+  }
+  
+  pom.click();
 }
 
 
